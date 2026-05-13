@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카드 뒤집기 게임</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px #e94560;
+    }
+
+    .info-bar {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 24px;
+      font-size: 1.1rem;
+    }
+
+    .info-bar span {
+      background: rgba(255,255,255,0.1);
+      padding: 8px 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .info-bar span b {
+      color: #e94560;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 14px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      perspective: 600px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      user-select: none;
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #0f3460, #1a1a5e);
+      border: 2px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.3);
+      font-size: 1.8rem;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #9b59b6, #6c3483);
+      border: 2px solid rgba(255,255,255,0.3);
+      transform: rotateY(180deg);
+      box-shadow: 0 4px 20px rgba(155,89,182,0.5);
+    }
+
+    .card.matched .card-back {
+      background: linear-gradient(135deg, #4CAF50, #2e7d32);
+      box-shadow: 0 4px 20px rgba(76,175,80,0.5);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: rotateY(180deg) scale(1); }
+      50% { transform: rotateY(180deg) scale(1.15); }
+      100% { transform: rotateY(180deg) scale(1); }
+    }
+
+    .card.wrong .card-back {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotateY(180deg) translateX(0); }
+      25% { transform: rotateY(180deg) translateX(-6px); }
+      75% { transform: rotateY(180deg) translateX(6px); }
+    }
+
+    #result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 30px;
+      font-size: 1.3rem;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #result .trophy { font-size: 3rem; }
+
+    button {
+      margin-top: 8px;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #e94560, #c62a47);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(233,69,96,0.6);
+    }
+  </style>
+</head>
+<body>
+
+<h1>🃏 카드 뒤집기</h1>
+
+<div class="info-bar">
+  <span>시도: <b id="moves">0</b></span>
+  <span>맞춘 쌍: <b id="matched">0</b> / 8</span>
+  <span>시간: <b id="timer">0</b>초</span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div id="result">
+  <div class="trophy">🏆</div>
+  <div id="result-msg"></div>
+  <button onclick="startGame()">다시 하기</button>
+</div>
+
+<script>
+  const EMOJIS = ['🍎','🍊','🍋','🍇','🍓','🌸','🌈','⭐'];
+
+  let flipped = [], matched = 0, moves = 0, lock = false;
+  let timerInterval, seconds = 0, gameStarted = false;
+
+  function startGame() {
+    clearInterval(timerInterval);
+    flipped = []; matched = 0; moves = 0; seconds = 0; lock = false; gameStarted = false;
+    document.getElementById('moves').textContent = 0;
+    document.getElementById('matched').textContent = 0;
+    document.getElementById('timer').textContent = 0;
+    document.getElementById('result').style.display = 'none';
+
+    const cards = [...EMOJIS, ...EMOJIS].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    cards.forEach((emoji, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.emoji = emoji;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">❓</div>
+          <div class="card-back">${emoji}</div>
+        </div>`;
+      card.addEventListener('click', () => onCardClick(card));
+      grid.appendChild(card);
+    });
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      seconds++;
+      document.getElementById('timer').textContent = seconds;
+    }, 1000);
+  }
+
+  function onCardClick(card) {
+    if (lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+    if (!gameStarted) { gameStarted = true; startTimer(); }
+
+    card.classList.add('flipped');
+    flipped.push(card);
+
+    if (flipped.length === 2) {
+      lock = true;
+      moves++;
+      document.getElementById('moves').textContent = moves;
+      checkMatch();
+    }
+  }
+
+  function checkMatch() {
+    const [a, b] = flipped;
+    if (a.dataset.emoji === b.dataset.emoji) {
+      a.classList.add('matched');
+      b.classList.add('matched');
+      matched++;
+      document.getElementById('matched').textContent = matched;
+      flipped = [];
+      lock = false;
+      if (matched === 8) endGame();
+    } else {
+      a.classList.add('wrong');
+      b.classList.add('wrong');
+      setTimeout(() => {
+        a.classList.remove('flipped', 'wrong');
+        b.classList.remove('flipped', 'wrong');
+        flipped = [];
+        lock = false;
+      }, 900);
+    }
+  }
+
+  function endGame() {
+    clearInterval(timerInterval);
+    let msg = '';
+    if (moves <= 12) msg = `완벽해요! 🌟 ${moves}번만에 클리어!`;
+    else if (moves <= 18) msg = `잘 하셨어요! 😊 ${moves}번 시도, ${seconds}초`;
+    else msg = `클리어! 🎉 ${moves}번 시도, ${seconds}초`;
+    document.getElementById('result-msg').textContent = msg;
+    document.getElementById('result').style.display = 'flex';
+  }
+
+  startGame();
+</script>
+</body>
+</html>

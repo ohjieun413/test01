@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Remove-Item *)",
+      "PowerShell(Start-Process \"C:\\\\Users\\\\je413.oh\\\\Documents\\\\01_TEST\\\\index.html\")"
+    ]
+  }
+}

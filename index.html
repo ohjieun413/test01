@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Township — 나만의 마을을 만들어봐요!!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    :root {
+      --green:      #34c759;
+      --green-d:    #248a3d;
+      --amber:      #ff9f0a;
+      --sky:        #32ade6;
+      --purple:     #af52de;
+      --red:        #ff3b30;
+      --bg:         #f5f5f7;
+      --surface:    #ffffff;
+      --text:       #1d1d1f;
+      --text-2:     #515154;
+      --text-3:     #86868b;
+      --radius-lg:  28px;
+      --radius:     20px;
+      --radius-sm:  14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Noto Sans KR", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ──────────────────────────────────────
+       HERO
+    ────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0a2e1a 0%, #0d3b22 40%, #1a5c35 70%, #2d7a4f 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 80px 24px 100px;
+      position: relative; overflow: hidden;
+    }
+
+    /* 배경 파티클 */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(52,199,89,0.25), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(255,159,10,0.18), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(50,173,230,0.15), transparent 35%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(52,199,89,0.2); border: 1px solid rgba(52,199,89,0.4);
+      color: #6ee89a; border-radius: 99px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px;
+      padding: 6px 14px; margin-bottom: 28px;
+      text-transform: uppercase; position: relative;
+    }
+
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: #34c759; display: inline-block;
+      box-shadow: 0 0 0 0 rgba(52,199,89,0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(52,199,89,0.6); }
+      70%  { box-shadow: 0 0 0 8px rgba(52,199,89,0); }
+      100% { box-shadow: 0 0 0 0 rgba(52,199,89,0); }
+    }
+
+    /* 앱 아이콘 */
+    .app-icon {
+      width: 120px; height: 120px; border-radius: 28px;
+      background: linear-gradient(145deg, #4ecb71 0%, #2a9d4f 50%, #1e7a3c 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.2rem; margin: 0 auto 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900; letter-spacing: -0.04em; line-height: 1.05;
+      color: #ffffff; margin-bottom: 16px; position: relative;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #34c759, #a8e063);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero .sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto 40px;
+      line-height: 1.65; font-weight: 400; position: relative;
+    }
+
+    .hero-cta {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 32px; border-radius: 99px;
+      background: var(--green); color: #fff;
+      font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
+      text-decoration: none;
+      box-shadow: 0 8px 30px rgba(52,199,89,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 12px 40px rgba(52,199,89,0.55); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 28px; border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.85);
+      font-size: 1rem; font-weight: 500; text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 64px;
+      position: relative; flex-wrap: wrap; justify-content: center;
+    }
+
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.04em;
+      color: #fff;
+    }
+    .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.5); font-weight: 500; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .stat-divider { width: 1px; background: rgba(255,255,255,0.15); align-self: stretch; }
+
+    /* 물결 구분선 */
+    .wave { display: block; width: 100%; margin-bottom: -2px; }
+
+    /* ──────────────────────────────────────
+       SECTIONS COMMON
+    ────────────────────────────────────── */
+    section {
+      max-width: 1080px; margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800; letter-spacing: -0.04em; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-body {
+      font-size: 1.05rem; color: var(--text-2); line-height: 1.7;
+      max-width: 580px;
+    }
+
+    /* ──────────────────────────────────────
+       WHY 심리 트리거 카드
+    ────────────────────────────────────── */
+    .why-bg { background: var(--bg); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 56px;
+    }
+
+    .why-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 12px 36px rgba(0,0,0,0.06);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), box-shadow 0.28s;
+      cursor: default;
+    }
+
+    .why-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.1);
+    }
+
+    .why-icon {
+      font-size: 2.4rem; margin-bottom: 20px; display: block;
+      line-height: 1;
+    }
+
+    .why-card h3 {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .why-card p { font-size: 0.88rem; color: var(--text-2); line-height: 1.65; }
+
+    .why-card .hook {
+      display: inline-block; margin-top: 14px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+      padding: 4px 12px; border-radius: 99px;
+    }
+
+    /* ──────────────────────────────────────
+       FEATURE — 큰 하이라이트
+    ────────────────────────────────────── */
+    .features-bg { background: #ffffff; }
+
+    .feature-list { display: flex; flex-direction: column; gap: 80px; margin-top: 64px; }
+
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+
+    .feature-row.reverse .feature-visual { order: 2; }
+    .feature-row.reverse .feature-text   { order: 1; }
+
+    .feature-visual {
+      border-radius: var(--radius-lg);
+      aspect-ratio: 4/3; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem; position: relative;
+    }
+
+    .feature-text .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 5px 12px; border-radius: 99px;
+      margin-bottom: 16px;
+    }
+
+    .feature-text h3 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .feature-text p { font-size: 0.95rem; color: var(--text-2); line-height: 1.7; }
+
+    .feature-text .psych {
+      margin-top: 20px; padding: 14px 18px;
+      background: var(--bg); border-radius: var(--radius-sm);
+      border-left: 3px solid;
+      font-size: 0.82rem; color: var(--text-2); line-height: 1.55;
+    }
+
+    .feature-text .psych strong { color: var(--text); }
+
+    /* 이모지 씬 비주얼 */
+    .scene {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px;
+      border-radius: var(--radius-lg);
+      position: relative; overflow: hidden;
+    }
+
+    .scene-grid {
+      display: grid; gap: 10px; font-size: 2.8rem; line-height: 1;
+    }
+
+    /* ──────────────────────────────────────
+       SOCIAL PROOF
+    ────────────────────────────────────── */
+    .proof-bg { background: var(--bg); }
+
+    .review-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 48px;
+    }
+
+    .review-card {
+      background: var(--surface); border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);
+    }
+
+    .stars { color: #ff9f0a; font-size: 0.9rem; margin-bottom: 12px; letter-spacing: 2px; }
+
+    .review-card p { font-size: 0.88rem; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+
+    .reviewer { display: flex; align-items: center; gap: 10px; }
+    .reviewer-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .reviewer-name { font-size: 0.82rem; font-weight: 600; }
+    .reviewer-date { font-size: 0.72rem; color: var(--text-3); }
+
+    /* ──────────────────────────────────────
+       CTA BOTTOM
+    ────────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(160deg, #0a2e1a 0%, #1a5c35 60%, #2d7a4f 100%);
+      padding: 120px 24px; text-align: center; position: relative; overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(52,199,89,0.2), transparent 60%);
+    }
+
+    .cta-section h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; letter-spacing: -0.04em; color: #fff;
+      margin-bottom: 16px; position: relative;
+    }
+
+    .cta-section p {
+      font-size: 1.1rem; color: rgba(255,255,255,0.6);
+      margin-bottom: 40px; position: relative;
+    }
+
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    .store-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 14px 28px; border-radius: var(--radius-sm);
+      background: #fff; color: var(--text); text-decoration: none;
+      font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .store-btn:hover { transform: scale(1.04); box-shadow: 0 8px 32px rgba(0,0,0,0.28); }
+    .store-btn:active { transform: scale(0.97); }
+
+    .store-btn .icon { font-size: 1.6rem; }
+
+    .store-btn .txt-small { font-size: 0.6rem; font-weight: 400; color: var(--text-2); display: block; }
+    .store-btn .txt-big   { font-size: 0.95rem; font-weight: 700; display: block; }
+
+    /* ──────────────────────────────────────
+       FOOTER
+    ────────────────────────────────────── */
+    footer {
+      background: #1d1d1f; color: rgba(255,255,255,0.4);
+      text-align: center; padding: 32px 24px;
+      font-size: 0.78rem; line-height: 1.8;
+    }
+
+    footer a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    /* ──────────────────────────────────────
+       SCROLL ANIMATION
+    ────────────────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ──────────────────────────────────────
+       RESPONSIVE
+    ────────────────────────────────────── */
+    @media (max-width: 780px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .review-grid { grid-template-columns: 1fr; }
+      .feature-row { grid-template-columns: 1fr; gap: 32px; }
+      .feature-row.reverse .feature-visual { order: unset; }
+      .feature-row.reverse .feature-text   { order: unset; }
+      .stat-divider { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-stats { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge">🌍 전 세계 2억명이 플레이 중</div>
+    <div class="app-icon">🏡</div>
+    <h1>당신만의 마을,<br><em>Township</em></h1>
+    <p class="sub">농장을 가꾸고, 도시를 세우고, 이웃과 교류하세요.<br>현실에서 못 이룬 꿈을 여기서 이루어보세요.</p>
+
+    <div class="hero-cta">
+      <a href="https://play.google.com/store/apps/details?id=com.playrix.township" target="_blank" rel="noopener" class="btn-primary">
+        <span>▶</span> 지금 무료로 시작하기
+      </a>
+      <a href="#why" class="btn-ghost">더 알아보기 ↓</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">2억+</div>
+        <div class="stat-label">글로벌 플레이어</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">⭐ 4.6</div>
+        <div class="stat-label">Play Store 평점</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">무료</div>
+        <div class="stat-label">기본 플레이</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">10년+</div>
+        <div class="stat-label">사랑받는 게임</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 파도 구분 -->
+  <svg class="wave" viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="background:#2d7a4f;display:block;">
+    <path d="M0,60 C360,0 1080,60 1440,0 L1440,60 Z" fill="#f5f5f7"/>
+  </svg>
+
+  <!-- ── WHY 심리 트리거 ── -->
+  <div class="why-bg" id="why">
+    <section>
+      <div class="reveal">
+        <p class="section-eyebrow" style="color:var(--green-d)">왜 Township인가</p>
+        <h2 class="section-title">당신이 멈출 수 없는<br>6가지 이유</h2>
+        <p class="section-body">게임은 단순한 오락이 아닙니다. Township은 인간의 가장 근본적인 욕구를 자극합니다.</p>
+      </div>
+
+      <div class="why-grid">
+
+        <div class="why-card reveal">
+          <span class="why-icon">🌱</span>
+          <h3>내가 키운 작물이 자라는 쾌감</h3>
+          <p>씨앗을 심고, 물을 주고, 수확하는 과정은 실제 농사보다 훨씬 빠른 보상 주기로 도파민을 자극합니다. 손 안에서 생명이 자라납니다.</p>
+          <span class="hook" style="background:rgba(52,199,89,0.12);color:var(--green-d)">🧠 즉각적 보상 심리</span>
+        </div>
+
+        <div class="why-card reveal">
+          <span class="why-icon">🏗️</span>
+          <h3>내 손으로 만드는 완벽한 도시</h3>
+          <p>현실에서 집 한 칸 짓기도 어렵지만, Township에서는 병원, 소방서, 극장까지 내 마음대로 배치합니다. 창조의 권능감을 경험하세요.</p>
+          <span class="hook" style="background:rgba(0,113,227,0.10);color:#0071e3">🧠 통제감·창조 욕구</span>
+        </div>
+
+        <div class="why-card reveal">
+          <span class="why-icon">👥</span>
+          <h3>혼자가 아닌, 함께하는 성장</h3>
+          <p>협동조합을 만들어 전 세계 플레이어와 협력하고 레가타 대회에서 팀 순위를 경쟁하세요. 소속감과 연대가 접속을 이어줍니다.</p>
+          <span class="hook" style="background:rgba(175,82,222,0.12);color:var(--purple)">🧠 소속감·사회적 욕구</span>
+        </div>
+
+        <div class="why-card reveal">
+          <span class="why-icon">🗺️</span>
+          <h3>끝없는 콘텐츠, 지루할 틈 없음</h3>
+          <p>농장, 광산, 외딴 섬, 공장, 동물원, 철도… 할 것이 넘쳐납니다. 레벨이 오를수록 새로운 세계가 열려 100레벨이 넘어도 신선합니다.</p>
+          <span class="hook" style="background:rgba(255,159,10,0.12);color:#c07300">🧠 호기심·탐험 욕구</span>
+        </div>
+
+        <div class="why-card reveal">
+          <span class="why-icon">🏆</span>
+          <h3>노력이 눈에 보이는 성취감</h3>
+          <p>마을 인구가 늘고, 건물이 올라가고, 창고가 채워지는 과정은 현실의 피로를 잊게 만드는 진짜 성취감을 줍니다. 내 마을이 자랑스러워집니다.</p>
+          <span class="hook" style="background:rgba(255,59,48,0.10);color:var(--red)">🧠 성취·자기효능감</span>
+        </div>
+
+        <div class="why-card reveal">
+          <span class="why-icon">🛋️</span>
+          <h3>하루 10분, 완벽한 현실 도피</h3>
+          <p>스트레스받는 하루 끝에 푸른 밭과 분주한 마을 주민들을 보고 있으면 마음이 차분해집니다. 터치 한 번으로 다른 세계로 이탈하세요.</p>
+          <span class="hook" style="background:rgba(50,173,230,0.12);color:#1a7fa8">🧠 현실 도피·힐링 욕구</span>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- ── FEATURES ── -->
+  <div class="features-bg">
+    <section>
+      <div class="reveal">
+        <p class="section-eyebrow" style="color:var(--green-d)">주요 기능</p>
+        <h2 class="section-title">Township이<br>특별한 이유</h2>
+      </div>
+
+      <div class="feature-list">
+
+        <!-- 농장 -->
+        <div class="feature-row reveal">
+          <div class="feature-visual">
+            <div class="scene" style="background:linear-gradient(135deg,#d4edda,#a8d5b5)">
+              <div class="scene-grid" style="grid-template-columns:repeat(4,1fr)">
+                🌽🌾🍅🥕 🍓🌻🥦🌿 🐄🐑🐓🐖
+              </div>
+            </div>
+          </div>
+          <div class="feature-text">
+            <span class="badge" style="background:rgba(52,199,89,0.12);color:var(--green-d)">🌾 농장</span>
+            <h3>30종 이상의 작물을 직접 재배</h3>
+            <p>밀부터 딸기, 옥수수까지 다양한 작물을 심고 수확하세요. 가축을 길러 우유, 달걀, 양털을 생산하고, 공장에서 가공품으로 만들어 마을을 부강하게 합니다.</p>
+            <div class="psych" style="border-color:var(--green)">
+              <strong>심리 포인트:</strong> 수확의 순간 느끼는 즉각적 보상감은 뇌의 도파민 회로를 자극합니다. "조금만 더 하면 다음 작물이 익는다"는 생각이 계속 이어집니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- 도시 건설 -->
+        <div class="feature-row reverse reveal">
+          <div class="feature-visual">
+            <div class="scene" style="background:linear-gradient(135deg,#d6eaf8,#aed6f1)">
+              <div style="font-size:3rem;line-height:1.3;text-align:center">
+                🏛️🏪🏥<br>🏫🚒🎭<br>🏡🌳🏗️
+              </div>
+            </div>
+          </div>
+          <div class="feature-text">
+            <span class="badge" style="background:rgba(0,113,227,0.10);color:#0071e3">🏙️ 도시</span>
+            <h3>내 마음대로 설계하는 이상적인 도시</h3>
+            <p>병원, 학교, 소방서, 극장, 공원 등 100개 이상의 건물을 자유롭게 배치하세요. 인구가 늘수록 더 많은 건물이 해금됩니다. 세상에 하나뿐인 나만의 도시입니다.</p>
+            <div class="psych" style="border-color:#0071e3">
+              <strong>심리 포인트:</strong> 도시 설계는 현실에서 불가능한 통제감을 제공합니다. "내가 모든 것을 결정한다"는 권능감이 강한 몰입을 만들어냅니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- 협동 -->
+        <div class="feature-row reveal">
+          <div class="feature-visual">
+            <div class="scene" style="background:linear-gradient(135deg,#f5e6ff,#dbb6f5)">
+              <div style="font-size:3rem;line-height:1.4;text-align:center">
+                👥🤝🌍<br>🏆🎖️⚓<br>🎪🎠🎡
+              </div>
+            </div>
+          </div>
+          <div class="feature-text">
+            <span class="badge" style="background:rgba(175,82,222,0.12);color:var(--purple)">🤝 커뮤니티</span>
+            <h3>전 세계 플레이어와 함께하는 레가타</h3>
+            <p>협동조합을 결성해 전 세계 팀과 레가타 대회에서 경쟁하세요. 서로 돕고, 전략을 짜고, 함께 1등을 목표로 합니다. 진짜 친구가 생기는 게임입니다.</p>
+            <div class="psych" style="border-color:var(--purple)">
+              <strong>심리 포인트:</strong> 팀의 일원이 된다는 소속감은 강력한 지속 동기입니다. "내가 빠지면 팀이 힘들어진다"는 책임감이 자연스러운 꾸준한 접속을 만듭니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- 광산 & 탐험 -->
+        <div class="feature-row reverse reveal">
+          <div class="feature-visual">
+            <div class="scene" style="background:linear-gradient(135deg,#fef3d0,#f5c842)">
+              <div style="font-size:3rem;line-height:1.4;text-align:center">
+                ⛏️💎🗝️<br>🏔️🌋🗺️<br>🚂✈️🚢
+              </div>
+            </div>
+          </div>
+          <div class="feature-text">
+            <span class="badge" style="background:rgba(255,159,10,0.12);color:#c07300">⛏️ 탐험</span>
+            <h3>광산, 섬, 철도… 끝없는 세계</h3>
+            <p>광산에서 희귀 광물을 캐고, 외딴 섬을 개발하고, 기차로 물자를 운반하세요. 비행기로 해외 도시에 물건을 수출하면 엄청난 보상이 기다립니다.</p>
+            <div class="psych" style="border-color:var(--amber)">
+              <strong>심리 포인트:</strong> 미지의 것을 탐험하고 싶은 인간의 호기심 본능을 자극합니다. "다음 층에 무엇이 있을까"라는 궁금증이 게임을 멈출 수 없게 만듭니다.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- ── REVIEWS ── -->
+  <div class="proof-bg">
+    <section>
+      <div class="reveal" style="text-align:center;margin-bottom:0">
+        <p class="section-eyebrow" style="color:var(--green-d);text-align:center">리얼 후기</p>
+        <h2 class="section-title" style="text-align:center">이미 수백만 명이<br>빠져있습니다</h2>
+      </div>
+
+      <div class="review-grid">
+
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p>"출퇴근 시간이 이 게임 덕분에 기다려집니다. 어느새 레벨 80이 넘었는데 아직도 할 게 넘쳐요. 진짜 마을 하나를 운영하는 느낌이에요."</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:#34c759">김</div>
+            <div>
+              <div class="reviewer-name">김지수 님</div>
+              <div class="reviewer-date">Google Play 리뷰</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p>"협동조합 친구들이 생겼어요. 서로 도와주며 대회 나가는 게 진짜 재미있습니다. 그냥 게임 친구인데 이제는 진짜 친구 같아요."</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:#0071e3">이</div>
+            <div>
+              <div class="reviewer-name">이민준 님</div>
+              <div class="reviewer-date">Google Play 리뷰</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p>"스트레스받는 날, 30분만 하다 보면 어느새 기분이 풀려있어요. 귀여운 그래픽에 잔잔한 BGM이 최고의 힐링입니다. 강력 추천!"</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:#af52de">박</div>
+            <div>
+              <div class="reviewer-name">박소연 님</div>
+              <div class="reviewer-date">Google Play 리뷰</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="cta-section">
+    <h2>지금 바로 마을을 시작하세요</h2>
+    <p>무료로 다운로드하고, 나만의 Township을 만들어보세요.</p>
+    <div class="cta-btns">
+      <a href="https://play.google.com/store/apps/details?id=com.playrix.township" target="_blank" rel="noopener" class="store-btn">
+        <span class="icon">▶</span>
+        <span>
+          <span class="txt-small">GET IT ON</span>
+          <span class="txt-big">Google Play</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p>Township™ is developed by <strong style="color:rgba(255,255,255,0.6)">Playrix</strong>. All rights reserved.</p>
+    <p style="margin-top:6px">
+      이 페이지는 홍보 목적으로 제작된 팬페이지입니다. ·
+      <a href="https://play.google.com/store/apps/details?id=com.playrix.township" target="_blank" rel="noopener">공식 다운로드 페이지 →</a>
+    </p>
+  </footer>
+
+  <script>
+    // 스크롤 reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, (entry.target.dataset.delay || 0));
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    // 카드 그리드는 순서대로 딜레이
+    document.querySelectorAll('.why-grid .reveal').forEach((el, i) => {
+      el.dataset.delay = i * 80;
+    });
+    document.querySelectorAll('.review-grid .reveal').forEach((el, i) => {
+      el.dataset.delay = i * 100;
+    });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 카드 3D 틸트
+    document.querySelectorAll('.why-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+
+    // 히어로 마우스 패럴랙스
+    const icon = document.querySelector('.app-icon');
+    document.addEventListener('mousemove', e => {
+      const cx = window.innerWidth  / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx * 8;
+      const dy = (e.clientY - cy) / cy * 8;
+      icon.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+  </script>
+
+</body>
+</html>
